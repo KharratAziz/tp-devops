@@ -10,10 +10,10 @@ on:
 jobs:
   test-backend:
     # The type of runner that the job will run on
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-outs your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
       # Sets up a Java JDK environment for use in actions
@@ -26,4 +26,33 @@ jobs:
 
       # Build and test the application using Maven
       - name: Build and test with Maven
-        run: cd simple-api && mvn -B clean verify 
+        run: cd simple-api && mvn -B clean verify
+
+  # This job builds the docker images for the different services
+  build-and-push-docker-image:
+    # It only runs after the test-backend job has completed successfully
+    needs: test-backend
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # The following steps build the docker images. `push` is false by default.
+      - name: Build image for backend
+        uses: docker/build-push-action@v6
+        with:
+          context: ./simple-api
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-simple-api:latest
+
+      - name: Build image for database
+        uses: docker/build-push-action@v6
+        with:
+          context: ./database
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-database:latest
+
+      - name: Build image for httpd
+        uses: docker/build-push-action@v6
+        with:
+          context: ./http-server
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest 
