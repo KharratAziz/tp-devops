@@ -6,10 +6,10 @@ on:
   # Permet de lancer ce workflow manuellement depuis l'interface GitHub
   workflow_dispatch:
 
-  # Vous pouvez aussi le déclencher à chaque push sur la branche main
-  # push:
-  #   branches:
-  #     - main
+  # Déclenche le workflow à chaque push sur la branche main
+  push:
+    branches:
+      - main
 
 # Définit les tâches à exécuter
 jobs:
