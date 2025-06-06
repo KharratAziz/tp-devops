@@ -1,8 +1,23 @@
 - hosts: all
-  become: true
+  name: Setup common infrastructure (Docker and Network)
   roles:
-    - docker     # 1. S'assure que Docker est installé
-    - network    # 2. Crée le réseau Docker pour nos conteneurs
-    - database   # 3. Lance le conteneur de la base de données
-    - app        # 4. Lance le conteneur de l'application
-    - proxy      # 5. Lance le conteneur du proxy qui expose l'application
+    - docker
+    - network
+
+- hosts: all
+  name: Deploy Database Service
+  tags: [database]
+  roles:
+    - database
+
+- hosts: all
+  name: Deploy Application Service
+  tags: [app]
+  roles:
+    - app
+
+- hosts: all
+  name: Deploy Proxy Service
+  tags: [proxy]
+  roles:
+    - proxy

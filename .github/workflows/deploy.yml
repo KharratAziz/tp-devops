@@ -13,37 +13,59 @@ on:
 
 # Définit les tâches à exécuter
 jobs:
-  deploy:
-    # Le type de machine virtuelle sur laquelle exécuter le job
+  # Job de préparation qui installe les dépendances
+  setup:
+    name: Setup Environment
     runs-on: ubuntu-latest
-
-    # Les étapes du job
     steps:
       # Étape 1: Récupère le code de votre dépôt
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Étape 2: Installe Ansible
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+      
+      # Étape 3: Sauvegarde le dossier ansible pour les jobs suivants
+      - name: Archive Ansible directory
+        uses: actions/upload-artifact@v4
+        with:
+          name: ansible-files
+          path: ansible/
+
+  # Job qui déploie les services en parallèle
+  deploy-services:
+    name: Deploy ${{ matrix.service }}
+    needs: setup # Ce job ne commence que si le job 'setup' a réussi
+    runs-on: ubuntu-latest
+    
+    # Utilise une matrice pour créer un job par service
+    strategy:
+      matrix:
+        service: [database, app, proxy]
+
+    steps:
+      # Étape 1: Récupère les fichiers Ansible sauvegardés par le job 'setup'
+      - name: Download Ansible directory
+        uses: actions/download-artifact@v4
+        with:
+          name: ansible-files
+          path: ansible/
+          
       # Étape 2: Configure la clé SSH pour se connecter au serveur
-      # Utilise une action de la marketplace pour le faire de manière sécurisée
       - name: Set up SSH key
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       # Étape 3: Ajoute l'hôte du serveur à la liste des hôtes connus
-      # Empêche la demande de confirmation de la clé SSH
       - name: Add remote server to known hosts
-        run: |
-          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+        run: ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
 
-      # Étape 4: Installe Ansible sur la machine virtuelle du workflow
-      - name: Install Ansible
+      # Étape 4: Exécute la partie du playbook Ansible correspondant au service
+      - name: Run Ansible Playbook for ${{ matrix.service }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ansible
-
-      # Étape 5: Exécute le playbook Ansible
-      - name: Run Ansible Playbook
-        run: |
-          cd ansible # Se déplace dans le dossier contenant le playbook
-          ansible-playbook playbook.yml -i inventories/setup.yml --extra-vars "ansible_user=${{ secrets.ANSIBLE_USER }}" 
+          cd ansible
+          ansible-playbook playbook.yml -i inventories/setup.yml --tags "${{ matrix.service }}" --extra-vars "ansible_user=${{ secrets.ANSIBLE_USER }}" 
