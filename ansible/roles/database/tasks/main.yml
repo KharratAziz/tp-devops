@@ -11,6 +11,7 @@
     name: database
     image: kharrataziz/tp-devops-database
     pull: true
+    recreate: true
     state: started
     restart_policy: always
     networks:

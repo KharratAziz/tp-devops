@@ -4,6 +4,7 @@
     name: httpd # <-- MODIFIÉ
     image: kharrataziz/tp-devops-httpd # <-- MODIFIÉ
     pull: true # Assure que la dernière version de l'image est utilisée
+    recreate: true # Force la recréation du conteneur à chaque déploiement
     state: started
     restart_policy: always
     networks:
