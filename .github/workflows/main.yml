@@ -57,9 +57,10 @@ jobs:
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-database:latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
-      - name: Build and push httpd image
+      - name: Build and push httpd-frontend image
         uses: docker/build-push-action@v6
         with:
-          context: ./http-server
+          context: .
+          file: ./http-server/Dockerfile
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
           push: ${{ github.ref == 'refs/heads/main' }} 
