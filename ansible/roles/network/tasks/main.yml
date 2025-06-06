@@ -1,0 +1,9 @@
+# roles/network/tasks/main.yml
+- name: Create the application Docker network
+  docker_network:
+    name:  my-network # Nom de notre réseau privé
+    state: present
+  vars:
+    # Indique à Ansible d'utiliser l'interpréteur Python de notre venv
+    # pour qu'il puisse trouver le SDK Docker que nous avons installé.
+    ansible_python_interpreter: /opt/docker_venv/bin/python

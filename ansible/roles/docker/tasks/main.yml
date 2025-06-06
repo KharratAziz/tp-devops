@@ -1,0 +1,77 @@
+
+# tasks file for roles/docker
+- name: Find and remove any old Docker repository files
+  find:
+    paths: /etc/apt/sources.list.d/
+    patterns: "*docker*.list"
+  register: docker_repo_files_to_delete
+
+- name: Remove found repository files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ docker_repo_files_to_delete.files }}"
+
+# Installer les prérequis pour Docker
+- name: Install required packages for Docker repository
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+      - python3-venv
+    state: latest
+    update_cache: yes
+
+# Ajouter la clé GPG officielle de Docker (méthode du TP)
+- name: Add Docker GPG key
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+# Mettre en place le dépôt Docker stable (méthode du TP)
+- name: Add Docker APT repository
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_facts['distribution_release'] }} stable"
+    state: present
+    update_cache: yes
+
+# Installer Docker Engine
+- name: Install Docker Engine
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+
+# Installer Python3 et pip3
+- name: Install Python3 and pip3
+  apt:
+    name:
+      - python3
+      - python3-pip
+    state: present
+
+# Créer un environnement virtuel pour le SDK Docker
+- name: Create a virtual environment for Docker SDK
+  command: python3 -m venv /opt/docker_venv
+  args:
+    creates: /opt/docker_venv
+
+# Installer le SDK Docker pour Python
+- name: Install Docker SDK for Python in virtual environment
+  pip:
+    name: docker
+    virtualenv: /opt/docker_venv
+
+# S'assurer que le service Docker est démarré
+- name: Make sure Docker service is running and enabled
+  service:
+    name: docker
+    state: started
+    enabled: yes

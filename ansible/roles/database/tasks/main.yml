@@ -1,0 +1,24 @@
+# Fichier de tâches pour le rôle 'database'
+- name: Créer le volume de persistance pour la base de données
+  docker_volume:
+    name: db-volume
+    state: present
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python
+
+- name: Lancer le conteneur de la base de données
+  docker_container:
+    name: database
+    image: kharrataziz/tp-devops-database
+    state: started
+    restart_policy: always
+    networks:
+      - name: my-network
+    volumes:
+      - "db-volume:/var/lib/postgresql/data"
+    env:
+      POSTGRES_USER: "{{ db_user }}"          
+      POSTGRES_DB: "{{ db_name }}"          
+      POSTGRES_PASSWORD: "{{ db_password }}" 
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python

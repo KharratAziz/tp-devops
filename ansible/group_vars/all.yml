@@ -1,0 +1,4 @@
+# my-project/ansible/group_vars/all.yml
+db_user: "user"
+db_password: "pwd"
+db_name: "mydatabase"

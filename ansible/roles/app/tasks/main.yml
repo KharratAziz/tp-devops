@@ -1,0 +1,15 @@
+- name: Lancer le conteneur de l'application
+  docker_container:
+    name: simple-api
+    image: kharrataziz/tp-devops-simple-api
+    state: started
+    restart_policy: always
+    networks:
+      - name: my-network
+    env:
+      DATABASE_HOST: "database"
+      DATABASE_USER: "{{ db_user }}"   
+      DATABASE_NAME: "{{ db_name }}"     
+      DATABASE_PASSWORD: "{{ db_password }}"
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python

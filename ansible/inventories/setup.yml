@@ -1,0 +1,8 @@
+all:
+  vars:
+    ansible_user: admin # Replace 'admin' if your SSH username is different
+    ansible_ssh_private_key_file: /home/zizou007pro/ssh
+  children:
+    prod:
+      hosts:
+        aziz.kharrat.takima.cloud

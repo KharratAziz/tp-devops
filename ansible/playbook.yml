@@ -1,0 +1,8 @@
+- hosts: all
+  become: true
+  roles:
+    - docker     # 1. S'assure que Docker est installé
+    - network    # 2. Crée le réseau Docker pour nos conteneurs
+    - database   # 3. Lance le conteneur de la base de données
+    - app        # 4. Lance le conteneur de l'application
+    - proxy      # 5. Lance le conteneur du proxy qui expose l'application

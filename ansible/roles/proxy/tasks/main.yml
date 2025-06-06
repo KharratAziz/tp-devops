@@ -1,0 +1,13 @@
+# roles/proxy/tasks/main.yml
+- name: Launch the proxy container
+  docker_container:
+    name: httpd # <-- MODIFIÉ
+    image: kharrataziz/tp-devops-httpd # <-- MODIFIÉ
+    state: started
+    restart_policy: always
+    networks:
+      - name: my-network # <-- MODIFIÉ
+    ports:
+      - "80:80" # Reste identique
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python

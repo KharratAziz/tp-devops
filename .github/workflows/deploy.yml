@@ -1,0 +1,49 @@
+# Nom du workflow qui apparaîtra dans l'onglet "Actions" de GitHub
+name: Deploy to Server with Ansible
+
+# Déclencheurs du workflow
+on:
+  # Permet de lancer ce workflow manuellement depuis l'interface GitHub
+  workflow_dispatch:
+
+  # Vous pouvez aussi le déclencher à chaque push sur la branche main
+  # push:
+  #   branches:
+  #     - main
+
+# Définit les tâches à exécuter
+jobs:
+  deploy:
+    # Le type de machine virtuelle sur laquelle exécuter le job
+    runs-on: ubuntu-latest
+
+    # Les étapes du job
+    steps:
+      # Étape 1: Récupère le code de votre dépôt
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Étape 2: Configure la clé SSH pour se connecter au serveur
+      # Utilise une action de la marketplace pour le faire de manière sécurisée
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Étape 3: Ajoute l'hôte du serveur à la liste des hôtes connus
+      # Empêche la demande de confirmation de la clé SSH
+      - name: Add remote server to known hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      # Étape 4: Installe Ansible sur la machine virtuelle du workflow
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      # Étape 5: Exécute le playbook Ansible
+      - name: Run Ansible Playbook
+        run: |
+          cd ansible # Se déplace dans le dossier contenant le playbook
+          ansible-playbook playbook.yml -i inventories/setup.yml --extra-vars "ansible_user=${{ secrets.ANSIBLE_USER }}" 
