@@ -38,21 +38,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # The following steps build the docker images. `push` is false by default.
-      - name: Build image for backend
+      # Login to Docker Hub using secrets
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      # The following steps build the docker images and push them only on the main branch
+      - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
           context: ./simple-api
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-simple-api:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
 
-      - name: Build image for database
+      - name: Build and push database image
         uses: docker/build-push-action@v6
         with:
           context: ./database
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-database:latest
+          push: ${{ github.ref == 'refs/heads/main' }}
 
-      - name: Build image for httpd
+      - name: Build and push httpd image
         uses: docker/build-push-action@v6
         with:
           context: ./http-server
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest 
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp-devops-httpd:latest
+          push: ${{ github.ref == 'refs/heads/main' }} 
