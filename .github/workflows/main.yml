@@ -1,0 +1,29 @@
+name: CI devops 2025
+
+# This workflow is triggered on push or pull request events for the main and develop branches
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  test-backend:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-22.04
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      # Sets up a Java JDK environment for use in actions
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      # Build and test the application using Maven
+      - name: Build and test with Maven
+        run: cd simple-api && mvn -B clean verify 
