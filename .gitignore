@@ -1,1 +1,4 @@
 .idea
+
+# Ignore the problematic submodule directory
+TP-GIT/
