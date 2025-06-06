@@ -3,6 +3,7 @@
   docker_container:
     name: httpd # <-- MODIFIÉ
     image: kharrataziz/tp-devops-httpd # <-- MODIFIÉ
+    pull: true # Assure que la dernière version de l'image est utilisée
     state: started
     restart_policy: always
     networks:

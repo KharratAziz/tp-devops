@@ -2,6 +2,7 @@
   docker_container:
     name: simple-api
     image: kharrataziz/tp-devops-simple-api
+    pull: true
     state: started
     restart_policy: always
     networks:

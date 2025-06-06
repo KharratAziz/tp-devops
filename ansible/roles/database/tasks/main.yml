@@ -10,6 +10,7 @@
   docker_container:
     name: database
     image: kharrataziz/tp-devops-database
+    pull: true
     state: started
     restart_policy: always
     networks:
