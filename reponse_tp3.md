@@ -1,6 +1,6 @@
 # Réponses au TP3 - Ansible et Déploiement Continu
 
-Ce document répond aux questions posées dans l'énoncé du TP3, en se basant sur le projet final que nous avons configuré ensemble.
+Ce document répond aux questions posées dans l'énoncé du TP3, en se basant sur le projet final.
 
 ---
 
@@ -9,8 +9,6 @@ Ce document répond aux questions posées dans l'énoncé du TP3, en se basant s
 #### Inventaire Ansible
 
 L'inventaire Ansible définit les serveurs sur lesquels nous allons opérer. Dans notre projet, il se trouve dans `ansible/inventories/setup.yml`.
-
-Contrairement à l'exemple de l'énoncé qui suggère de stocker la clé SSH et l'utilisateur directement dans le fichier, notre projet est configuré pour une utilisation en intégration continue. Les informations sensibles sont donc gérées par les secrets GitHub Actions.
 
 Voici la structure de notre inventaire :
 
@@ -31,7 +29,6 @@ Les variables comme `ansible_user` et la clé SSH sont fournies dynamiquement pa
 
 #### Commandes de Base
 
-L'énoncé présente plusieurs commandes de base ("ad-hoc") pour interagir avec les serveurs.
 
 1.  **`ansible all -i inventories/setup.yml -m ping`**
     *   **Rôle :** C'est une commande de diagnostic fondamentale. Elle se connecte à tous (`all`) les serveurs définis dans l'inventaire (`-i ...`) et exécute le module (`-m`) `ping`.
@@ -91,7 +88,7 @@ Notre playbook a évolué pour devenir plus modulaire et réutilisable grâce à
 3.  **Utilisation des Tags :** C'est une fonctionnalité clé de notre refactorisation.
     *   Chaque play de déploiement de service possède un `tag` (ex: `tags: [app]`).
     *   Cela nous permet, depuis notre workflow GitHub Actions, d'exécuter uniquement une partie du playbook en utilisant l'option `--tags`.
-    *   C'est ainsi que nous avons pu créer, comme vous le souhaitiez, des jobs de déploiement séparés et visibles dans GitHub Actions pour chaque composant.
+    *   C'est ainsi que nous avons pu créer des jobs de déploiement séparés et visibles dans GitHub Actions pour chaque composant.
 
 ---
 
